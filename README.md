@@ -57,10 +57,18 @@ dashboard muestra:
 2. En [share.streamlit.io](https://share.streamlit.io), conecta tu cuenta de
    GitHub y crea una app nueva apuntando a este repo, rama y archivo principal
    `dashboard.py`.
-3. Al arrancar, `dashboard.py` detecta que `pml.db` no existe en el
-   contenedor (el disco de Community Cloud es efimero) y corre
-   `cargar_datos.py` automaticamente a partir de los CSV del repo antes de
-   mostrar el dashboard.
+3. Al arrancar el proceso, `dashboard.py` corre `cargar_datos.py`
+   automaticamente contra los CSV del repo antes de mostrar el dashboard
+   (una sola vez por proceso, gracias a `st.cache_resource`). Como el ETL es
+   idempotente, esto es seguro y asegura que la base de datos siempre
+   refleje los CSV mas recientes, incluso si Community Cloud reinicia el
+   proceso sin borrar el disco.
+
+**Para actualizar los precios ya publicados:** agrega los CSV nuevos a
+`PMLs_csv/` en tu copia local y sube el cambio (`git add`, `git commit`,
+`git push`). Streamlit Community Cloud detecta el push y reinicia la app
+sola; al reiniciar, vuelve a correr el ETL y la base de datos queda
+actualizada con los CSV nuevos.
 
 ## Notas sobre el formato de los CSV de CENACE
 

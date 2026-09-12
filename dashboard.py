@@ -30,13 +30,16 @@ COLOR_ZONA_B = "#d62728"  # rojo
 
 @st.cache_resource
 def asegurar_base_de_datos() -> None:
-    """En Streamlit Community Cloud el disco es efimero (se reinicia con cada
-    redeploy), asi que si pml.db no existe todavia en el contenedor, se genera
-    aqui mismo a partir de los CSV incluidos en el repo. st.cache_resource
-    asegura que esto corra una sola vez por sesion del servidor, no en cada
-    rerun de la app."""
-    if not os.path.exists(RUTA_DB):
-        cargar_datos.main()
+    """Corre el ETL (cargar_datos.py) contra los CSV incluidos en el repo cada
+    vez que arranca el proceso del servidor. No basta con generar pml.db solo
+    si falta: Streamlit Community Cloud puede reiniciar el proceso con el
+    codigo nuevo (tras un git push) sin borrar el disco, asi que un pml.db
+    viejo se quedaria estancado con los CSV de antes. Como cargar_datos.main()
+    es idempotente (INSERT OR REPLACE), volver a correrlo siempre es seguro y
+    barato, y garantiza que la base refleje los CSV mas recientes del repo.
+    st.cache_resource asegura que esto corra una sola vez por proceso, no en
+    cada rerun de la app."""
+    cargar_datos.main()
 
 
 def obtener_conexion() -> sqlite3.Connection:
