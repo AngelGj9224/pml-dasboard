@@ -1,0 +1,7 @@
+pml.db
+__pycache__/
+*.pyc
+.venv/
+venv/
+.claude/
+Instrucciones para dashboard interactivo.txt
